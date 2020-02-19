@@ -116,7 +116,7 @@ Http Functions:
 如果您未使用 Cloud Shell，請先使用 `az login` 登入。
 
 ```azurecli-interactive
-az group create --name myResourceGroup --location westeurope
+az group create --name myResourceGroup --location eastus
 ```
 ## <a name="create-an-azure-storage-account"></a>建立 Azure 儲存體帳戶
 
@@ -125,7 +125,7 @@ az group create --name myResourceGroup --location westeurope
 在下列命令中，使用全域唯一儲存體帳戶名稱來替代您看見 `<storage_name>` 預留位置的地方。 儲存體帳戶名稱必須介於 3 到 24 個字元的長度，而且只能包含數字和小寫字母。
 
 ```azurecli-interactive
-az storage account create --name <storage_name> --location westeurope --resource-group myResourceGroup --sku Standard_LRS
+az storage account create --name <storage_name> --location eastus --resource-group myResourceGroup --sku Standard_LRS
 ```
 
 
@@ -136,7 +136,7 @@ az storage account create --name <storage_name> --location westeurope --resource
 在下列命令中，使用唯一函式應用程式名稱來替代您看見 `<APP_NAME>` 預留位置的地方，並使用儲存體帳戶名稱來替代 `<STORAGE_NAME>`。 `<APP_NAME>` 會作為函式應用程式的預設 DNS 網域，所以此名稱在 Azure 的所有應用程式中都必須是唯一的名稱。 您也應該從 `dotnet` (C#) 或 `node` (JavaScript)，設定函式應用程式的 `<language>` 執行階段。
 
 ```azurecli-interactive
-az functionapp create --resource-group myResourceGroup --consumption-plan-location westeurope \
+az functionapp create --resource-group myResourceGroup --consumption-plan-location eastus \
 --name <APP_NAME> --storage-account  <STORAGE_NAME> --runtime <language>
 ```
 

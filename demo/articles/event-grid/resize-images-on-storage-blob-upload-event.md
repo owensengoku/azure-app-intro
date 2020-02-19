@@ -79,7 +79,7 @@ Azure Functions 需要一般的儲存體帳戶。 除了您在上一個教學課
 3. 建立 Azure 函式的儲存體帳戶。 
 
     ```azurecli-interactive
-    az storage account create --name $functionstorage --location southeastasia \
+    az storage account create --name $functionstorage --location eastus \
     --resource-group $resourceGroupName --sku Standard_LRS --kind storage
     ```
 
@@ -98,7 +98,7 @@ Azure Functions 需要一般的儲存體帳戶。 除了您在上一個教學課
 
     ```azurecli-interactive
     az functionapp create --name $functionapp --storage-account $functionstorage \
-    --resource-group $resourceGroupName --consumption-plan-location southeastasia
+    --resource-group $resourceGroupName --consumption-plan-location eastus
     ```
 
 現在，您必須設定函式應用程式，才能連線到您在[上一個教學課程][previous-tutorial]中建立的 Blob 儲存體帳戶。
