@@ -1,0 +1,3 @@
+```
+docker build –t tailwindtraders .
+```
