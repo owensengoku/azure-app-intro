@@ -107,7 +107,6 @@ Http Functions:
 
 從執行階段輸出複製 `HttpTrigger` 函式的 URL，並將它貼到瀏覽器的網址列。 將查詢字串 `?name=<yourname>` 附加至此 URL 並執行要求。 下圖顯示瀏覽器中對於本機函式傳回之 GET 要求所做出的回應︰
 
-![在瀏覽器中進行本機測試](./media/functions-run-function-test-local/functions-test-local-browser.png)
 
 您現在已經在本機執行您的函式，您可以開始在 Azure 中建立函數應用程式與其他必要資源。
 
@@ -137,10 +136,10 @@ az storage account create --name <storage_name> --location eastus --resource-gro
 
 ```azurecli-interactive
 az functionapp create --resource-group myResourceGroup --consumption-plan-location eastus \
---name <APP_NAME> --storage-account  <STORAGE_NAME> --runtime <language>
+--name <APP_NAME> --storage-account  <STORAGE_NAME> --runtime dotnet
 ```
 
-設定 _consumption-plan-location_ 參數，即表示函數應用程式是裝載於取用主控方案。 在這個無伺服器方案中，會根據您的函式，視需要動態新增資源，且只有在函式執行時才需要付費。 如需詳細資訊，請參閱[選擇正確的主控方案](functions-scale.md)。
+設定 _consumption-plan-location_ 參數，即表示函數應用程式是裝載於取用主控方案。 在這個無伺服器方案中，會根據您的函式，視需要動態新增資源，且只有在函式執行時才需要付費。
 
 建立函式應用程式後，Azure CLI 會顯示類似下列範例的資訊：
 

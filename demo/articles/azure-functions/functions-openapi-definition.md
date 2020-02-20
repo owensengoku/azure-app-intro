@@ -226,5 +226,4 @@ REST API 通常會使用 OpenAPI 定義來描述。 此定義包含有關 API �
 
 2. 開啟下載的 JSON 檔案並檢閱定義。
 
-[!INCLUDE [clean-up-section-portal](../../includes/clean-up-section-portal.md)]
 

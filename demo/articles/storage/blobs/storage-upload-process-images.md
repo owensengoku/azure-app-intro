@@ -28,7 +28,7 @@
 下列範例會建立名為 `myResourceGroup` 的資源群組。
 
 ```azurecli-interactive
-az group create --name myResourceGroup --location southeastasia
+az group create --name myResourceGroup --location eastus
 
 ```
 
@@ -40,9 +40,9 @@ az group create --name myResourceGroup --location southeastasia
 在下列命令中，使用您自己的全域唯一名稱來取代見到 `<blob_storage_account>` 預留位置的 Blob 儲存體帳戶。
 
 ```azurecli-interactive
-$blobStorageAccount="<blob_storage_account>"
+blobStorageAccount="<blob_storage_account>"
 
-az storage account create --name $blobStorageAccount --location southeastasia --resource-group myResourceGroup --sku Standard_LRS --kind blobstorage --access-tier hot
+az storage account create --name $blobStorageAccount --location eastus --resource-group myResourceGroup --sku Standard_LRS --kind blobstorage --access-tier hot
 
 ```
 
@@ -55,7 +55,7 @@ az storage account create --name $blobStorageAccount --location southeastasia --
 images  容器的公用存取設為 `off`。 thumbnails  容器的公用存取設為 `container`。 `container` 公用存取設定允許使用者瀏覽網頁來檢視縮圖。
 
 ```azurecli-interactive
-$blobStorageAccountKey=$(az storage account keys list -g myResourceGroup -n $blobStorageAccount --query [0].value --output tsv)
+blobStorageAccountKey=$(az storage account keys list -g myResourceGroup -n $blobStorageAccount --query [0].value --output tsv)
 
 az storage container create -n images --account-name $blobStorageAccount --account-key $blobStorageAccountKey --public-access off
 
@@ -70,7 +70,6 @@ echo $blobStorageAccountKey
 
 ## <a name="create-an-app-service-plan"></a>建立應用程式服務方案
 
-[App Service 方案](../../app-service/overview-hosting-plans.md)會指定用來裝載應用程式的 Web 伺服器陣列位置、大小和功能。
 
 使用 [az appservice plan create](/cli/azure/appservice/plan) 命令來建立 App Service 方案。
 
@@ -83,12 +82,12 @@ az appservice plan create --name myAppServicePlan --resource-group myResourceGro
 
 ## <a name="create-a-web-app"></a>建立 Web 應用程式
 
-Web 應用程式提供裝載範例應用程式程式碼的空間，此程式碼是從 GitHub 範例存放庫部署。 使用 [az webapp create](/cli/azure/webapp) 命令，在 `myAppServicePlan` App Service 方案中建立 [Web 應用程式](../../app-service/overview.md)。  
+Web 應用程式提供裝載範例應用程式程式碼的空間，此程式碼是從 GitHub 範例存放庫部署。 使用 [az webapp create](/cli/azure/webapp) 命令，在 `myAppServicePlan` App Service 方案中建立 Web 應用程式
 
 在下列命令中，使用唯一的名稱取代 `<web_app>`。 有效字元是 `a-z`、`0-9` 和 `-`。 如果 `<web_app>` 不是唯一的，您會收到錯誤訊息：_具有指定名稱 `<web_app>` 的網站已經存在。_ Web 應用程式的預設 URL 是 `https://<web_app>.azurewebsites.net`。  
 
 ```azurecli-interactive
-$webapp="<web_app>"
+webapp="<web_app>"
 
 az webapp create --name $webapp --resource-group myResourceGroup --plan myAppServicePlan
 
@@ -183,12 +182,3 @@ public static async Task<bool> UploadFileToStorage(Stream fileStream, string fil
 
 ![Azure 入口網站的影像清單容器](https://docs.microsoft.com/zh-tw/azure/storage/blobs/media/storage-upload-process-images/figure13.png)
 
-## <a name="test-thumbnail-viewing"></a>測試縮圖檢視
-
-若要測試縮圖檢視，您要將映像上傳至 **thumbnails** 容器，以檢查應用程式是否否讀取 **thumbnails** 容器。
-
-登入 [Azure 入口網站](https://portal.azure.com)。 從左側的功能表中選取 [儲存體帳戶]  ，然後選取您的儲存體帳戶名稱。 選取 [容器]  ，然後選取**縮圖**容器。 選取 [上傳]  開啟 [上傳 Blob]  窗格。
-
-使用檔案選擇器選擇檔案，並選取 [上傳]  。
-
-巡覽回您的應用程式，確認可以看到上傳至 [縮圖]  容器的影像。

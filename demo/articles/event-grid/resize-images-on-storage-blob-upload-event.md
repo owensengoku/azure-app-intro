@@ -1,62 +1,34 @@
----
-title: 教學課程：使用 Azure 事件方格以自動調整上傳映像的大小
-description: 教學課程：Azure Event Grid 可在 Azure 儲存體的 Blob 上傳項目上觸發。 您可以使用此將上傳至 Azure 儲存體的映像檔案傳送至其他服務 (例如 Azure Functions)，以調整大小和其他改善功能。
-services: event-grid, functions
-author: spelluru
-manager: jpconnoc
-editor: ''
-ms.service: event-grid
-ms.tgt_pltfrm: na
-ms.devlang: na
-ms.topic: tutorial
-ms.date: 11/05/2019
-ms.author: spelluru
-ms.custom: mvc
-ms.openlocfilehash: 4359ce859e3fbe270785c3cf4bbc673e71d19799
-ms.sourcegitcommit: bc7725874a1502aa4c069fc1804f1f249f4fa5f7
-ms.translationtype: HT
-ms.contentlocale: zh-TW
-ms.lasthandoff: 11/07/2019
-ms.locfileid: "73718214"
----
+
 # <a name="tutorial-automate-resizing-uploaded-images-using-event-grid"></a>教學課程：使用 Event Grid 自動調整已上傳映像的大小
 
-[Azure Event Grid](overview.md) 是一項雲端事件服務。 Event Grid 可讓您建立由 Azure 服務或協力廠商資源引發之事件的訂閱。  
+Azure Event Grid 是一項雲端事件服務。 Event Grid 可讓您建立由 Azure 服務或協力廠商資源引發之事件的訂閱。  
 
-本教學課程是一系列儲存體教學課程的第二部分。 它延伸了[上一個儲存體教學課程][previous-tutorial]，以使用 Azure Event Grid 與 Azure Functions 新增無伺服器自動縮圖產生。 Event Grid 可讓 [Azure Functions](../azure-functions/functions-overview.md) 回應 [Azure Blob 儲存體](../storage/blobs/storage-blobs-introduction.md)事件，並產生上傳映像的縮圖。 針對 Blob 儲存體建立事件建立事件訂閱。 當 blob 加入特定的 Blob 儲存體容器時，會呼叫函式端點。 從 Event Grid 傳遞至函式繫結的資料用於存取 Blob 並產生縮圖映像。
+本教學課程是一系列儲存體教學課程的第二部分。 它延伸了[上一個儲存體教學課程][previous-tutorial]，以使用 Azure Event Grid 與 Azure Functions 新增無伺服器自動縮圖產生。 Event Grid 可讓 Azure Function 回應 Azure Blob 儲存體 事件，並產生上傳映像的縮圖。 針對 Blob 儲存體建立事件建立事件訂閱。 當 blob 加入特定的 Blob 儲存體容器時，會呼叫函式端點。 從 Event Grid 傳遞至函式繫結的資料用於存取 Blob 並產生縮圖映像。
 
 您可以使用 Azure CLI 與 Azure 入口網站，將調整大小功能加入現有的映像上傳應用程式。
 
 # <a name="nettabdotnet"></a>[\.NET](#tab/dotnet)
 
-![瀏覽器中已發佈的 Web 應用程式]https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/tutorial-completed.png)
+![瀏覽器中已發佈的 Web 應用程式](https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/tutorial-completed.png)
 
 ---
 
 在本教學課程中，您會了解如何：
 
-> [!div class="checklist"]
 > * 建立一般的 Azure 儲存體帳戶
 > * 使用 Azure Functions 部署無伺服器程式碼
 > * 在 Event Grid 中建立 Blob 儲存體事件訂閱
 
 ## <a name="prerequisites"></a>必要條件
 
-[!INCLUDE [updated-for-az](../../includes/updated-for-az.md)]
-
 若要完成本教學課程：
 
-您必須已完成先前的 Blob 儲存體教學課程︰[使用 Azure 儲存體在雲端中上傳影像資料][previous-tutorial]。
-
-[!INCLUDE [quickstarts-free-trial-note](../../includes/quickstarts-free-trial-note.md)]
 
 如果您先前未在訂用帳戶中註冊事件方格資源提供者，請務必註冊。
 
 ```azurecli-interactive
 az provider register --namespace Microsoft.EventGrid
 ```
-
-[!INCLUDE [cloud-shell-try-it.md](../../includes/cloud-shell-try-it.md)]
 
 如果您選擇在本機安裝和使用 CLI，本教學課程需要 Azure CLI 2.0.14 版或更新版本。 執行 `az --version` 以尋找版本。 如果您需要安裝或升級，請參閱[安裝 Azure CLI]( /cli/azure/install-azure-cli)。 
 
@@ -110,7 +82,11 @@ Azure Functions 需要一般的儲存體帳戶。 除了您在上一個教學課
 # <a name="nettabdotnet"></a>[\.NET](#tab/dotnet)
 
 ```azurecli-interactive
+可以先 
+echo $blobStorageAccount 確認一下之前設置的還在
+
 blobStorageAccount=<name of the Blob storage account you created in the previous tutorial>
+
 storageConnectionString=$(az storage account show-connection-string --resource-group $resourceGroupName \
 --name $blobStorageAccount --query connectionString --output tsv)
 
@@ -141,7 +117,7 @@ az functionapp deployment source config --name $functionapp --resource-group $re
 
 從 Event Grid 通知傳遞給函式的資料包括 Blob 的 URL。 該 URL 接著會傳遞至輸入繫結，以從 Blob 儲存體獲取上傳的映像。 此函式會產生縮圖映像，並將產生的串流寫入 Blob 儲存體中的個別容器。 
 
-此專案使用 `EventGridTrigger` 作為觸發程序類型。 建議透過一般 HTTP 觸發程序使用 Event Grid 觸發程序。 Event Grid 會自動驗證 Event Grid 函式的觸發程序。 若要使用 HTTP 觸發程序，您必須實作[驗證回應](security-authentication.md)。
+此專案使用 `EventGridTrigger` 作為觸發程序類型。 建議透過一般 HTTP 觸發程序使用 Event Grid 觸發程序。 Event Grid 會自動驗證 Event Grid 函式的觸發程序。 若要使用 HTTP 觸發程序，您必須實作驗證回應
 
 # <a name="nettabdotnet"></a>[\.NET](#tab/dotnet)
 
@@ -157,15 +133,15 @@ az functionapp deployment source config --name $functionapp --resource-group $re
 
 1. 在 [Azure 入口網站](https://portal.azure.com)中，選取左側功能表中的 [所有服務]  ，然後選取 [函式應用程式]  。 
 
-    ![瀏覽至 Azure 入口網站中的函式應用程式]https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/portal-find-functions.png)
+    ![瀏覽至 Azure 入口網站中的函式應用程式](https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/portal-find-functions.png)
 
 2. 展開函式應用程式，選擇 **Thumbnail** 函式，然後選取 [新增事件方格訂用帳戶]  。
 
-    ![瀏覽至 Azure 入口網站中的函式應用程式]https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/add-event-subscription.png)
+    ![瀏覽至 Azure 入口網站中的函式應用程式](https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/add-event-subscription.png)
 
 3. 使用表格中指定的事件訂閱設定。
     
-    ![從 Azure 入口網站中的函式建立事件訂閱]https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/event-subscription-create.png)
+    ![從 Azure 入口網站中的函式建立事件訂閱](https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/event-subscription-create.png)
 
     | 設定      | 建議的值  | 說明                                        |
     | ------------ |  ------- | -------------------------------------------------- |
@@ -175,13 +151,13 @@ az functionapp deployment source config --name $functionapp --resource-group $re
     | **資源群組** | myResourceGroup | 選取 [使用現有]  ，並選擇您在本教學課程中一直使用的資源群組。  |
     | **Resource** |  您的 Blob 儲存體帳戶 |  選擇您建立的 Blob 儲存體帳戶。 |
     | **事件類型** | 已建立 Blob | 取消勾選 [已建立 Blob]  以外的所有類型。 只有 `Microsoft.Storage.BlobCreated` 的事件類型會傳遞至函式。| 
-    | **訂閱者類型** |  自動產生 |  預先定義為 Web Hook。 |
-    | **訂閱者端點** | 自動產生 | 使用為您產生的端點 URL。 | 
+    | **訂閱者類型** |  自動產生 | FunctionApp |
+    | **訂閱者端點** | 自動產生 | Thumbnail。 | 
 4. 切換至 [篩選條件]  索引標籤，執行下列動作：     
     1. 選取 [啟用主旨篩選]  選項。
     2. 針對 [主旨開頭]  ，輸入下列值： **/blobServices/default/containers/images/blobs/** 。
 
-        ![指定事件訂閱的篩選條件]https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/event-subscription-filter.png) 
+        ![指定事件訂閱的篩選條件](https://docs.microsoft.com/zh-tw/azure/event-grid/media/resize-images-on-storage-blob-upload-event/event-subscription-filter.png) 
 2. 選取 [建立]  以新增事件訂閱。 當 Blob 新增至 `images` 容器時，這會建立可觸發 `Thumbnail` 函式的事件訂閱。 此函式會調整映像大小，並將其新增至 `thumbnails` 容器。
 
 既然已設定了後端服務，您可以在範例 Web 應用程式中測試映像調整大小功能。 
