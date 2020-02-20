@@ -10,10 +10,8 @@ $ az aks get-credentials -g myResourceGroup -n myCluster
 
 $ kubectl get nodes
 
-$ az aks list –o table
-
+$ az aks list -o table
 
 $ az aks scale -g myResourceGroup -n myCluster --agent-count 10
-\ Running ..
 
 ```
